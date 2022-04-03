@@ -12,14 +12,15 @@ def word_loading(file):
     return word_list
 
 def word_picking(word_list):
-    rand_word = random.choice(word_list)    # agarra una palabra de la lista al azar
-    return rand_word
+    rand_word = random.choice(word_list)        # agarra una palabra de la lista al azar
+    word = [w for w in rand_word if w != "\n"]  # crea una lista con rand_word sin "\n"
+    return word                                 # devuelve la palabra en formato de lista
 
 
 def run():
     f = file_opening()          # abrimos el archivo data.txt
     words = word_loading(f)     # cargamos las palabras en una lista
-    chosen_word = word_picking(words)
+    chosen_word = word_picking(words)   # pido una palabra al azar de la lista y la recibo como lista
 
 
 if __name__ == '__main__':
