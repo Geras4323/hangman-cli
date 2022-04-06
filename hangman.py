@@ -1,5 +1,7 @@
 import os
 import random
+import sys
+import time
 
 EQUIVALENCES = {
     "á": "a",
@@ -10,8 +12,12 @@ EQUIVALENCES = {
 }
 
 def file_opening(directory, mode):
-    f = open(directory, mode, encoding="utf-8")
-    return f
+    try:
+        f = open(directory, mode, encoding="utf-8")
+        return f
+    except FileNotFoundError:
+        print("No se encontró el archivo con palabras.")
+        sys.exit(1)
 
 def word_loading(file):
     word_list = []          # va a contener todas las palabras
@@ -47,7 +53,7 @@ def replace(word, undscs, u_input):
 
 
 def run():
-    file = file_opening("./archivos/data.txt", "r")      # abrimos el archivo data.txt
+    file = file_opening("./archivos/data_test.txt", "r")      # abrimos el archivo data.txt
     words = word_loading(file)     # cargamos las palabras en una lista
     chosen_word = word_picking(words)   # pido una palabra al azar de la lista y la recibo como lista
     final_word = word_ready(chosen_word)    # saca acentos y pone la palabra en mayuscula
@@ -56,8 +62,17 @@ def run():
     while underscores != final_word:    # mientras las listas sean distintas, mostrar la lista a medida que se va completando
         print("- Ahorcado! -")
         print(" ".join(underscores))
-        user_input = str(input("Ingrese una letra: ")).upper()
-        replace(final_word, underscores, user_input)
+        try:
+            user_input = str(input("Ingrese una letra: ")).upper()
+        ############################################################ 
+            if user_input<"A" or user_input>"Z" and user_input != "Ñ":
+                raise TypeError("Solo letras de la A a la Z.")
+        except TypeError as TE:
+            print(TE)
+            time.sleep(2)
+        ############################################################ 
+        else:
+            replace(final_word, underscores, user_input)
         os.system("cls")
     
     print("La palabra era: ", ("". join(final_word)))
