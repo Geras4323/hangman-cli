@@ -46,35 +46,64 @@ def create_undscs(word):
     return undscs_list
 
 def replace(word, undscs, u_input):
+    change = False
     for index, value in enumerate(word):
         if u_input == value:
             undscs[index] = u_input
-            # change = True ### para las vidas
+            change = True ### para las vidas
+    return change
+
+def chk_used_letters(lives, list, u_input):     # resta vidas si lo ingresado todavia no se habia ingresado
+    subtract_live = True
+    for i in list:          # por cada letra incorrecta ingresada antes...
+        if u_input == i:    # si lo que ingreso el usuario ya estaba en la lista...
+            subtract_live = False   # entonces no hay que restar vidas
+    if subtract_live == True:
+        return lives-1
+    return lives
+
+def chk_lives(lives):
+    if lives > 0:
+        print("FELICIDADES!!!")
+    else:
+        print("GAME OVER")
 
 
 def run():
-    file = file_opening("./archivos/data_test.txt", "r")      # abrimos el archivo data.txt
+    file = file_opening("./archivos/data.txt", "r")      # abrimos el archivo data.txt
     words = word_loading(file)     # cargamos las palabras en una lista
     chosen_word = word_picking(words)   # pido una palabra al azar de la lista y la recibo como lista
     final_word = word_ready(chosen_word)    # saca acentos y pone la palabra en mayuscula
     underscores = create_undscs(final_word)     # tengo otra lista que tenga un "_" por cada letra de la palabra
-    os.system("cls")               # limpiamos pantalla
-    while underscores != final_word:    # mientras las listas sean distintas, mostrar la lista a medida que se va completando
+    used_letters_correct = []
+    used_letters_incorrect = []
+    lives = 10
+    os.system("cls")        # limpiamos pantalla
+    while underscores != final_word and lives > 0:    # mientras las listas sean distintas, mostrar la lista a medida que se va completando
         print("- Ahorcado! -")
-        print(" ".join(underscores))
+        print(" ".join(underscores), "\n")
+        print("Vidas: ", lives)
+        print("Letras correctas usadas: ", ", ".join(used_letters_correct))
+        print("Letras incorrectas usadas: ", ", ".join(used_letters_incorrect))
         try:
             user_input = str(input("Ingrese una letra: ")).upper()
-        ############################################################ 
+        ############################################################
             if user_input<"A" or user_input>"Z" and user_input != "Ñ":
                 raise TypeError("Solo letras de la A a la Z.")
         except TypeError as TE:
             print(TE)
             time.sleep(2)
-        ############################################################ 
+        ############################################################
         else:
-            replace(final_word, underscores, user_input)
+            change = replace(final_word, underscores, user_input)
+            if change != True:
+                lives = chk_used_letters(lives, used_letters_incorrect, user_input)     # obtiene las vidas correspondientes segun la lista de incorrectas
+                used_letters_incorrect.append(user_input)     # va agregando las letras que se usaron
+            else:
+                used_letters_correct.append(user_input)
         os.system("cls")
     
+    chk_lives(lives)    # imprime mensaje segun vidas
     print("La palabra era: ", ("". join(final_word)))
     file.close()
 
